@@ -164,26 +164,27 @@
             background: rgba(255,255,255,0.12);
         }
 
+        .color-nickname-row {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            min-height: 1.3em;
+        }
         .color-nickname {
             font-weight: 400; opacity: 0.75; pointer-events: none;
-            min-height: 1.3em; transition: opacity 0.3s;
+            transition: opacity 0.3s;
             font-size: clamp(0.6rem, 1.1vw, 0.95rem);
             display: block;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            margin-bottom: 5px;
         }
         /* vertical si > 7 couleurs */
         .many-colors .color-nickname {
             writing-mode: unset;
             white-space: nowrap; overflow: visible;
-            margin-bottom: 0;
         }
         /* très compressé si > 12 couleurs */
         .too-many-colors .color-nickname {
             writing-mode: unset;
             white-space: nowrap; overflow: visible;
             font-size: 0.58rem; opacity: 0.5;
-            margin-bottom: 0;
         }
         .too-many-colors .color-hex { font-size: clamp(0.45rem, 0.9vw, 0.85rem); }
 
@@ -215,8 +216,8 @@
         }
         .many-colors .color-info .color-hex,
         .too-many-colors .color-info .color-hex,
-        .many-colors .color-info .color-nickname,
-        .too-many-colors .color-info .color-nickname {
+        .many-colors .color-info .color-nickname-row,
+        .too-many-colors .color-info .color-nickname-row {
             overflow: hidden;
             text-overflow: ellipsis;
             min-width: 0;
@@ -224,6 +225,19 @@
         }
 
         .color-nickname.loading { opacity: 0.3; font-style: italic; }
+
+        .color-hex-row {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-copy-hex-v {
+            flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.15); color: inherit;
+            opacity: 0; cursor: pointer; transition: opacity 0.15s, background 0.15s;
+        }
+        .color-column:hover .btn-copy-hex-v { opacity: 0.75; }
+        .btn-copy-hex-v:hover { opacity: 1 !important; background: rgba(0,0,0,0.35); }
+        .btn-copy-hex-v.copied { opacity: 1 !important; background: rgba(34,197,94,0.35) !important; }
 
         .btn-delete-col {
             position: absolute; top: 10px; right: 10px;
@@ -293,11 +307,25 @@
         }
         .row-cell-value.mono { font-family: 'Inter', monospace; font-size: 0.78rem; color: #79c0ff; }
 
+        .hex-with-copy {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+        }
+        .btn-copy-hex {
+            width: 18px; height: 18px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.15);
+            cursor: pointer; opacity: 0; transition: opacity 0.15s, background 0.15s;
+        }
+        .color-row:hover .btn-copy-hex { opacity: 0.8; }
+        .btn-copy-hex:hover { opacity: 1 !important; background: rgba(0,0,0,0.4); }
+        .btn-copy-hex.copied { opacity: 1 !important; background: rgba(34,197,94,0.4) !important; }
+
         .row-merged-name {
             font-size: 0.82rem; color: #c9d1d9; font-weight: 500;
             cursor: text; outline: none;
             border-bottom: 1px dashed transparent;
             white-space: nowrap; overflow: hidden; min-width: 60px;
+            flex-shrink: 1;
         }
         .row-merged-name.loading { color: var(--text-muted); font-style: italic; }
         .row-merged-name.custom { color: var(--text); }
@@ -442,17 +470,17 @@
     </div>
     <div class="controls">
         <button class="btn btn-accent" id="addBtn">+ Ajouter</button>
-        <button class="btn" id="modeToggleBtn">⇄ Horizontal</button>
+        <button class="btn" id="modeToggleBtn">⇄ Vertical</button>
         <button class="btn" id="exportBtn" title="Exporter en .palcol">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M5 8l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             .palcol
         </button>
-        <label class="btn" id="importLabel" title="Importer un .palcol" style="cursor:pointer;">
+        <button class="btn" id="importBtn" title="Importer un .palcol">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 11V2M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             Importer
-            <input type="file" id="importInput" accept=".palcol" style="display:none;">
-        </label>
-        <button class="btn" id="saveFileBtn" title="Sauvegarder dans le fichier .palcol ouvert (ou télécharger)">
+        </button>
+        <input type="file" id="importInput" accept=".palcol" style="display:none;">
+        <button class="btn" id="saveFileBtn" title="Sauvegarder dans le fichier .palcol ouvert (les modifications suivantes seront auto-sauvegardées)">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 2h9l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><rect x="5" y="9" width="6" height="5" rx="0.5" stroke="currentColor" stroke-width="1.5"/><rect x="5" y="2" width="5" height="3" rx="0.5" stroke="currentColor" stroke-width="1.5"/></svg>
             Sauvegarder
         </button>
@@ -470,7 +498,7 @@
     </div>
 </div>
 
-<div class="capture-area mode-vertical" id="captureArea">
+<div class="capture-area mode-horizontal" id="captureArea">
     <div class="palette-container" id="paletteContainer"></div>
     <div class="branding-footer" id="brandingFooter">PALETTE STUDIO PLUS</div>
 </div>
@@ -512,7 +540,7 @@
 let currentColors = ["#93B5C6","#A1C931","#F0CF65","#D7816A","#BD4F6C"];
 let colorLabels   = {};
 let colorNotes    = {};
-let currentMode   = 'vertical';
+let currentMode   = 'horizontal';
 const nameCache   = {};
 let paletteName   = '';       // Nom de la palette
 let isDirty       = false;    // Modifications non sauvegardées
@@ -528,6 +556,7 @@ const captureArea      = document.getElementById('captureArea');
 const modeToggleBtn    = document.getElementById('modeToggleBtn');
 const addBtn           = document.getElementById('addBtn');
 const exportBtn        = document.getElementById('exportBtn');
+const importBtn        = document.getElementById('importBtn');
 const importInput      = document.getElementById('importInput');
 const paletteNameInput = document.getElementById('paletteNameInput');
 const unsavedDot       = document.getElementById('unsavedDot');
@@ -580,6 +609,15 @@ function hsvToHex(h,s,v){
 function sanitizeHex(raw) {
     return raw.replace(/[^0-9a-fA-F]/g,'').slice(0,6).toUpperCase();
 }
+// Nettoie un nom de couleur collé : retire mise en forme, retours à la ligne,
+// et ne garde que les caractères pris en charge par le champ (lettres, chiffres,
+// espaces et ponctuation courante des noms de couleur).
+function sanitizeColorName(raw) {
+    let s = raw.replace(/[\r\n\t]+/g, ' ');
+    s = s.replace(/[^\p{L}\p{N}\s'&()°%/,.\-]/gu, '');
+    s = s.replace(/\s+/g, ' ');
+    return s.trim();
+}
 function isColorDuplicate(hex, excludeIndex = -1) {
     const h = hex.toUpperCase();
     return currentColors.some((c, i) => i !== excludeIndex && c.toUpperCase() === h);
@@ -593,6 +631,29 @@ function flashPickerDuplicate() {
         panel.style.boxShadow = '';
         hexInput.classList.remove('invalid');
     }, 600);
+}
+// Copie générique dans le presse-papier avec fallback
+function copyTextToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text);
+    }
+    return new Promise((resolve, reject) => {
+        try {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            resolve();
+        } catch(e) { reject(e); }
+    });
+}
+function flashCopyBtn(btn) {
+    btn.classList.add('copied');
+    setTimeout(() => btn.classList.remove('copied'), 900);
 }
 
 /* ═══════════════════════════════════════════
@@ -830,7 +891,8 @@ function renderVertical() {
 
         col.addEventListener('click', e => {
             if (e.target.classList.contains('color-hex') ||
-                e.target.classList.contains('btn-delete-col')) return;
+                e.target.classList.contains('btn-delete-col') ||
+                e.target.closest('.btn-copy-hex-v')) return;
             openPicker(col, color, hex => {
                 currentColors[index] = hex.toUpperCase();
                 markDirty();
@@ -893,12 +955,31 @@ function renderVertical() {
             }
         });
 
+        const hexRow = document.createElement('div');
+        hexRow.className = 'color-hex-row';
+        hexRow.appendChild(hexEl);
+
+        const copyBtnV = document.createElement('button');
+        copyBtnV.className = 'btn-copy-hex-v';
+        copyBtnV.title = 'Copier le code hex';
+        copyBtnV.innerHTML = '<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 11V3a1.5 1.5 0 011.5-1.5H10" stroke="currentColor" stroke-width="1.3"/></svg>';
+        copyBtnV.addEventListener('click', e => {
+            e.stopPropagation();
+            copyTextToClipboard(color.toUpperCase().replace('#','')).then(() => flashCopyBtn(copyBtnV)).catch(()=>{});
+        });
+        hexRow.appendChild(copyBtnV);
+
+        const nickRow = document.createElement('div');
+        nickRow.className = 'color-nickname-row';
+
         const nameEl = document.createElement('div');
         nameEl.className = 'color-nickname' + (nameCache[key]!==undefined ? '' : ' loading');
         nameEl.textContent = nameCache[key] !== undefined ? nameCache[key] : '…';
 
-        info.appendChild(hexEl);
-        info.appendChild(nameEl);
+        nickRow.appendChild(nameEl);
+
+        info.appendChild(hexRow);
+        info.appendChild(nickRow);
         col.appendChild(info);
         paletteContainer.appendChild(col);
     });
@@ -925,13 +1006,29 @@ function renderHorizontal() {
         swatch.style.backgroundColor = color;
         swatch.style.color = textColor;
 
+        const hexWrap = document.createElement('div');
+        hexWrap.className = 'hex-with-copy';
+
         const hexLbl = document.createElement('div');
         hexLbl.className = 'row-hex-label';
         hexLbl.textContent = color.toUpperCase();
-        swatch.appendChild(hexLbl);
+        hexWrap.appendChild(hexLbl);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'btn-copy-hex';
+        copyBtn.title = 'Copier le code hex';
+        copyBtn.style.color = textColor;
+        copyBtn.innerHTML = '<svg width="10" height="10" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 11V3a1.5 1.5 0 011.5-1.5H10" stroke="currentColor" stroke-width="1.3"/></svg>';
+        copyBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            copyTextToClipboard(color.toUpperCase().replace('#','')).then(() => flashCopyBtn(copyBtn)).catch(()=>{});
+        });
+        hexWrap.appendChild(copyBtn);
+
+        swatch.appendChild(hexWrap);
 
         swatch.addEventListener('click', e => {
-            if (e.target.classList.contains('btn-delete-row')) return;
+            if (e.target.classList.contains('btn-delete-row') || e.target.closest('.btn-copy-hex')) return;
             openPicker(swatch, color, hex => {
                 const newHex = hex.toUpperCase();
                 // Efface le cache pour forcer le refresh du nom
@@ -963,6 +1060,7 @@ function renderHorizontal() {
         cellRgb.appendChild(rgbVal);
 
         const cellName = makeCell('Nom');
+
         const mergedName = document.createElement('div');
         const hasCustom = !!colorLabels[index];
         const apiName   = nameCache[key];
@@ -978,6 +1076,13 @@ function renderHorizontal() {
             range.selectNodeContents(mergedName);
             window.getSelection().removeAllRanges();
             window.getSelection().addRange(range);
+        });
+        // Collage : ne garde que les caractères pris en charge par le champ (pas de mise en forme, pas de retours à la ligne)
+        mergedName.addEventListener('paste', e => {
+            e.preventDefault();
+            const raw = (e.clipboardData || window.clipboardData).getData('text/plain');
+            const clean = sanitizeColorName(raw);
+            document.execCommand('insertText', false, clean);
         });
         mergedName.addEventListener('blur', () => {
             const val = mergedName.textContent.trim();
@@ -996,6 +1101,7 @@ function renderHorizontal() {
                 mergedName.blur();
             }
         });
+
         cellName.appendChild(mergedName);
 
         const cellNotes = makeCell('Notes / Usage');
@@ -1081,20 +1187,106 @@ modeToggleBtn.addEventListener('click', () => {
 });
 
 savePaletteBtn.addEventListener('click', () => {
-    brandingFooter.style.display = 'block';
-    html2canvas(captureArea, {
-        logging: false, useCORS: true,
-        width: window.innerWidth,
-        height: captureArea.scrollHeight,
-        scale: window.devicePixelRatio,
-    }).then(canvas => {
-        brandingFooter.style.display = 'none';
+    generatePalettePNG();
+});
+
+// Génère un PNG dédié, indépendant du mode d'affichage à l'écran : une bande
+// par couleur, hauteur fixe (~5cm) chacune, empilées jusqu'en bas quel que soit
+// le nombre de couleurs. Garde le nom de la palette s'il est renseigné.
+async function generatePalettePNG() {
+    const exportWidth   = 1000;   // largeur fixe de l'export, en px
+    const swatchHeight  = '5cm';  // hauteur par couleur (le navigateur convertit en px)
+
+    const exportDiv = document.createElement('div');
+    exportDiv.style.position = 'fixed';
+    exportDiv.style.left = '-100000px';
+    exportDiv.style.top = '0';
+    exportDiv.style.width = exportWidth + 'px';
+    exportDiv.style.background = '#0a0a0f';
+    exportDiv.style.fontFamily = "'Inter', -apple-system, sans-serif";
+
+    currentColors.forEach((color, i) => {
+        const key       = color.toUpperCase().replace('#','');
+        const textColor = getTextColor(color);
+        const name      = colorLabels[i] || nameCache[key] || '';
+
+        const band = document.createElement('div');
+        band.style.height = swatchHeight;
+        band.style.width = '100%';
+        band.style.boxSizing = 'border-box';
+        band.style.background = color;
+        band.style.color = textColor;
+        band.style.display = 'flex';
+        band.style.flexDirection = 'column';
+        band.style.alignItems = 'center';
+        band.style.justifyContent = 'center';
+        band.style.gap = '10px';
+
+        const hexEl = document.createElement('div');
+        hexEl.textContent = color.toUpperCase();
+        hexEl.style.fontWeight = '700';
+        hexEl.style.fontSize = '34px';
+        hexEl.style.letterSpacing = '-0.5px';
+        hexEl.style.fontFamily = "'Inter', monospace";
+        band.appendChild(hexEl);
+
+        if (name) {
+            const nameEl = document.createElement('div');
+            nameEl.textContent = name;
+            nameEl.style.fontSize = '18px';
+            nameEl.style.opacity = '0.8';
+            band.appendChild(nameEl);
+        }
+
+        exportDiv.appendChild(band);
+    });
+
+    // Pied de page : nom de la palette (si renseigné) + branding
+    const footer = document.createElement('div');
+    footer.style.background = '#0a0a0f';
+    footer.style.color = '#f0f0ff';
+    footer.style.textAlign = 'center';
+    footer.style.padding = '22px 0';
+    footer.style.borderTop = '1px solid rgba(255,255,255,0.12)';
+
+    if (paletteName) {
+        const nameLine = document.createElement('div');
+        nameLine.textContent = paletteName;
+        nameLine.style.fontWeight = '700';
+        nameLine.style.fontSize = '19px';
+        nameLine.style.letterSpacing = '0.3px';
+        nameLine.style.marginBottom = '5px';
+        footer.appendChild(nameLine);
+    }
+    const brandLine = document.createElement('div');
+    brandLine.textContent = 'PALETTE STUDIO PLUS';
+    brandLine.style.fontWeight = '700';
+    brandLine.style.letterSpacing = '2px';
+    brandLine.style.fontSize = '12px';
+    brandLine.style.opacity = '0.5';
+    footer.appendChild(brandLine);
+    exportDiv.appendChild(footer);
+
+    document.body.appendChild(exportDiv);
+    try {
+        const canvas = await html2canvas(exportDiv, {
+            logging: false,
+            useCORS: true,
+            width: exportWidth,
+            height: exportDiv.scrollHeight,
+            scale: window.devicePixelRatio,
+        });
         const a = document.createElement('a');
-        a.download = `palette-studio-${Date.now()}.png`;
+        const fname = paletteName ? paletteName.replace(/[^a-zA-Z0-9_\-]/g,'_') : `palette-studio-${Date.now()}`;
+        a.download = `${fname}.png`;
         a.href = canvas.toDataURL('image/png');
         a.click();
-    }).catch(() => { brandingFooter.style.display = 'none'; });
-});
+    } catch(e) {
+        // Échec silencieux (ex : image externe non chargée)
+    } finally {
+        document.body.removeChild(exportDiv);
+    }
+}
 
 /* ═══════════════════════════════════════════
    EXPORT / IMPORT .palcol
@@ -1126,18 +1318,46 @@ function exportPalcol() {
     markClean();
 }
 
+/* Bouton Importer : utilise showOpenFilePicker (garde un handle réutilisable
+   pour la sauvegarde directe) si dispo, sinon repli sur l'input file classique */
+importBtn.addEventListener('click', async () => {
+    if ('showOpenFilePicker' in window) {
+        try {
+            const [handle] = await window.showOpenFilePicker({
+                types: [{ description: 'Fichier palette', accept: {'text/plain': ['.palcol']} }],
+                excludeAcceptAllOption: false
+            });
+            fileHandle = handle;
+            const file = await handle.getFile();
+            loadPalcolFile(file);
+            return;
+        } catch(e) {
+            if (e && e.name === 'AbortError') return; // l'utilisateur a annulé, on s'arrête là
+            // Sinon (API indisponible dans ce contexte, permissions, iframe, non-HTTPS...) : repli ci-dessous
+        }
+    }
+    fileHandle = null;
+    importInput.click();
+});
+
 importInput.addEventListener('change', () => {
     const file = importInput.files[0];
     if (!file) return;
+    // Pas de handle disponible via cet input classique
+    fileHandle = null;
     loadPalcolFile(file);
     importInput.value = '';
 });
 
 function loadPalcolFile(file) {
+    if (!file.name.toLowerCase().endsWith('.palcol')) {
+        alert('Seuls les fichiers .palcol sont acceptés.');
+        return;
+    }
     const reader = new FileReader();
     reader.onload = e => {
         try {
-            parsePalcol(e.target.result);
+            parsePalcol(e.target.result, file.name);
         } catch(err) {
             alert('Erreur import : ' + err.message);
         }
@@ -1145,13 +1365,13 @@ function loadPalcolFile(file) {
     reader.readAsText(file);
 }
 
-function parsePalcol(text) {
+function parsePalcol(text, fileName) {
     const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
     // Première ligne : count[;nom de la palette]
     const firstParts = lines[0].split(';');
     const count = parseInt(firstParts[0]);
     if (isNaN(count)) throw new Error('Format invalide');
-    const importedName = firstParts[1] ? firstParts[1].trim() : '';
+    const embeddedName = firstParts[1] ? firstParts[1].trim() : '';
 
     const newColors = [], newLabels = {}, newNotes = {};
     for (let i = 1; i <= count && i < lines.length; i++) {
@@ -1167,24 +1387,54 @@ function parsePalcol(text) {
     currentColors = newColors;
     colorLabels   = newLabels;
     colorNotes    = newNotes;
-    if (importedName) {
-        paletteName = importedName;
-        paletteNameInput.value = importedName;
+
+    // Nom de la palette : priorité au nom du fichier importé (ex: "CAB & TCA.palcol"
+    // -> "CAB & TCA"), avec repli sur le nom éventuellement stocké dans le fichier.
+    let derivedName = '';
+    if (fileName) derivedName = fileName.replace(/\.palcol$/i, '').trim();
+    const finalName = derivedName || embeddedName;
+    if (finalName) {
+        paletteName = finalName;
+        paletteNameInput.value = finalName;
     }
+
     markClean();
     renderAll(); loadNamesForAll();
 }
 
 /* ═══════════════════════════════════════════
-   DIRTY / CLEAN STATE
+   DIRTY / CLEAN STATE + AUTO-SAUVEGARDE
 ═══════════════════════════════════════════ */
+let autoSaveTimer = null;
+
 function markDirty() {
     isDirty = true;
     unsavedDot.classList.add('visible');
+    scheduleAutoSave();
 }
 function markClean() {
     isDirty = false;
     unsavedDot.classList.remove('visible');
+}
+
+// Si un fichier est déjà ouvert (import ou premier "Sauvegarder"), on réécrit
+// dedans tout seul peu après chaque modification, sans action manuelle.
+function scheduleAutoSave() {
+    if (!fileHandle) return;
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(doAutoSave, 900);
+}
+async function doAutoSave() {
+    if (!fileHandle || !isDirty) return;
+    try {
+        const writable = await fileHandle.createWritable();
+        await writable.write(buildPalcolContent());
+        await writable.close();
+        markClean();
+        flashSaveBtn('✓ Auto-sauvegardé');
+    } catch(e) {
+        // Échec silencieux (permission perdue, etc.) : le bouton Sauvegarder reste disponible en repli
+    }
 }
 
 /* Avertissement avant rechargement */
@@ -1207,8 +1457,9 @@ paletteNameInput.addEventListener('input', () => {
    SAUVEGARDE DIRECTE (File System Access API)
 ═══════════════════════════════════════════ */
 saveFileBtn.addEventListener('click', async () => {
+    clearTimeout(autoSaveTimer);
     const content = buildPalcolContent();
-    // Si on a un handle de fichier ouvert (File System Access API), écrire dedans
+    // Si on a un handle de fichier ouvert (import ou save précédent), on réécrit au même endroit
     if (fileHandle) {
         try {
             const writable = await fileHandle.createWritable();
@@ -1218,10 +1469,11 @@ saveFileBtn.addEventListener('click', async () => {
             flashSaveBtn('✓ Sauvegardé');
             return;
         } catch(e) {
-            // Permission refusée ou autre erreur, fallback
+            // Permission refusée ou autre erreur, fallback ci-dessous
         }
     }
-    // File System Access API disponible → proposer de choisir un fichier
+    // File System Access API disponible → proposer de choisir un fichier (garde le handle ensuite,
+    // ce qui active l'auto-sauvegarde pour toutes les modifications suivantes)
     if ('showSaveFilePicker' in window) {
         try {
             const fname = paletteName ? paletteName.replace(/[^a-zA-Z0-9_\-]/g,'_') : 'palette';
@@ -1233,7 +1485,7 @@ saveFileBtn.addEventListener('click', async () => {
             await writable.write(content);
             await writable.close();
             markClean();
-            flashSaveBtn('✓ Sauvegardé');
+            flashSaveBtn('✓ Sauvegardé — les prochains changements seront auto-sauvegardés');
         } catch(e) {
             if (e.name !== 'AbortError') { exportPalcol(); }
         }
@@ -1262,10 +1514,10 @@ function flashSaveBtn(msg) {
 let dragCounter = 0;
 
 document.addEventListener('dragenter', e => {
-    const hasPalcol = [...(e.dataTransfer?.items || [])].some(
+    const hasFile = [...(e.dataTransfer?.items || [])].some(
         item => item.kind === 'file'
     );
-    if (!hasPalcol) return;
+    if (!hasFile) return;
     dragCounter++;
     dropOverlay.classList.add('active');
 });
@@ -1278,13 +1530,28 @@ document.addEventListener('drop', e => {
     e.preventDefault();
     dragCounter = 0;
     dropOverlay.classList.remove('active');
-    const file = e.dataTransfer?.files?.[0];
+
+    const dt = e.dataTransfer;
+    if (!dt) return;
+
+    // Important : on récupère le File de façon SYNCHRONE (dt.files), car après un
+    // "await", les données du drag peuvent devenir invalides selon les navigateurs.
+    const file = dt.files && dt.files[0];
     if (!file) return;
-    if (!file.name.endsWith('.palcol')) {
-        alert('Seuls les fichiers .palcol sont acceptés.');
-        return;
-    }
+
+    fileHandle = null;
     loadPalcolFile(file);
+
+    // En best-effort, on tente aussi de récupérer un handle réutilisable pour que
+    // "Sauvegarder" puisse réécrire directement au même endroit ensuite.
+    // Ceci ne bloque pas l'import (déjà fait ci-dessus) et échoue silencieusement
+    // si l'API n'est pas disponible (navigateur, contexte non sécurisé, etc.).
+    const item = dt.items && dt.items[0];
+    if (item && item.kind === 'file' && item.getAsFileSystemHandle) {
+        item.getAsFileSystemHandle().then(handle => {
+            if (handle && handle.kind === 'file') fileHandle = handle;
+        }).catch(() => { /* pas grave, l'import a déjà réussi */ });
+    }
 });
 
 /* ═══════════════════════════════════════════
